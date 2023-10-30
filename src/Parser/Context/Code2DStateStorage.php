@@ -65,17 +65,17 @@ class Code2DStateStorage
 {
     private int $qrCodeModel = 50;
     private int $qrModuleSize = 0;
-    private EccLevel $qrErrorCorrectionLevel = EccLevel::L;
+    private int $qrErrorCorrectionLevel = QRCode::ECC_L;  #change type of var to ECCLevel and value to ECCLevel::L for qrcode 5.0
     private string $symbolStorage = '' ;
 
     public function __construct(){ $this->reset();}
 
     //To implement the ESC @ reset.
     public function reset(){
-        $this->$qrCodeModel = 50;  //50 is the default.
-        $this->$qrModuleSize = 4;  //TODO: The specs call for a printer default.  Denso says 4 in their guide: https://www.qrcode.com/en/howto/cell.html
-        $this->qrErrorCorrectionLevel = EccLevel::L; //48 (low) is the default.
-        $this->symbolStorage = null;
+        $this->qrCodeModel = 50;  //50 is the default.
+        $this->qrModuleSize = 4;  //TODO: The specs call for a printer default.  Denso says 4 in their guide: https://www.qrcode.com/en/howto/cell.html
+        $this->qrErrorCorrectionLevel = QRCode::ECC_L; //48 (low) is the default.
+        $this->symbolStorage = '';
     }
 
     //To implement GS ( k <Function 165>,  this sets the QR code model.  
@@ -106,16 +106,16 @@ class Code2DStateStorage
         // chillerlan/php-qrcode version          
         switch ($x) { //EccLevel::X where X is: L M Q H 
             case 48:
-                $this->qrErrorCorrectionLevel = ECCLevel::L;
+                $this->qrErrorCorrectionLevel = QRCode::ECC_L; #ECCLevel::L; #for qrcode 5.0
                 break;
             case 49:
-                $this->qrErrorCorrectionLevel = ECCLevel::M;
+                $this->qrErrorCorrectionLevel = QRCode::ECC_M; #ECCLevel::M; #for qrcode 5.0
                 break;
             case 50:
-                $this->qrErrorCorrectionLevel = ECCLevel::Q;
+                $this->qrErrorCorrectionLevel = QRCode::ECC_Q; #ECCLevel::Q; #for qrcode 5.0
                 break;
             case 51:
-                $this->qrErrorCorrectionLevel = ECCLevel::H;
+                $this->qrErrorCorrectionLevel = QRCode::ECC_H; #ECCLevel::H; #for qrcode 5.0
                 break;
             default:
                 //TODO: We should probably return an error if another value is sent.

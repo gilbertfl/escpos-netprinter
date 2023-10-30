@@ -18,6 +18,8 @@ class Code2DDataCmd extends DataCmd
     private $pL = null;
     private $pH = null;
     private $cn = null;
+    private int $dataSize = 0;
+    private $subCommand = null;
   
     //Process one command byte.  Return true if the byte is interpreted without error
     public function addChar($char)
@@ -35,31 +37,48 @@ class Code2DDataCmd extends DataCmd
         }
         //Now interpret the subcommand
         elseif ($this->cn === null) {
-            $this -> cn = ord($char);
+            $this->cn = ord($char);
 
             //If the command is known, assign subCommand with the interpreter class
             if($this->cn == 48){
                 //this is a PDF417 code command
+                $this->subCommand = new UnimplementedCode2DSubCommand($this->dataSize);
             }
             elseif($this->cn == 49){
                 //this is a QR code command
-                $this->subCommand = new QRcodeSubCommand($this->datasize);
+                $this->subCommand = new QRcodeSubCommand($this->dataSize);
             }
-            elseif(50 <= $this->cn <= 54) {
+            elseif($this->cn == 50) {
                 //this is one of the other valid codes
+                $this->subCommand = new UnimplementedCode2DSubCommand($this->dataSize);
+            }
+            elseif($this->cn == 51) {
+                //this is one of the other valid codes
+                $this->subCommand = new UnimplementedCode2DSubCommand($this->dataSize);
+            }
+            elseif($this->cn == 52) {
+                //this is one of the other valid codes
+                $this->subCommand = new UnimplementedCode2DSubCommand($this->dataSize);
+            }
+            elseif($this->cn == 53) {
+                //this is one of the other valid codes
+                $this->subCommand = new UnimplementedCode2DSubCommand($this->dataSize);
+            }
+            elseif($this->cn == 54) {
+                //this is one of the other valid codes
+                $this->subCommand = new UnimplementedCode2DSubCommand($this->dataSize);
             }
             else return false; //This code is not a valid function. Stop all processing.
             return true;
         }
         else  { //Process everything after cn
-            if ($this->subCommand === null){
-                //If subCommand is null, the command is not implemented. Stop all processing.
-                return false;
-            }
-            else {
                 //Send the fn and parameter data to the subcommand
                 return $this->subCommand->addChar($char);
-            }
         }
+    }
+
+    public function subCommand()
+    {
+        return $this->subCommand;
     }
 }

@@ -102,6 +102,7 @@ class Printout extends Command
     public $commands = array();
     private $search;
     private $searchStack;
+    private $rawData = "";
 
     public function __construct(ParserContext $context)
     {
@@ -118,6 +119,7 @@ class Printout extends Command
 
     public function addChar($char)
     {
+        $this->rawData .= $char;  //Log the whole command in case of command recognition errors
         if (count($this -> searchStack) > 0) {
             // Matching parts of a command now.
             return $this -> navigateCommand($char);
@@ -134,6 +136,7 @@ class Printout extends Command
         }
         // Has been rejected or we don't have a command yet. See if we can start a string
         if (count($this -> commands) == 0 || !is_a($this -> commands[count($this -> commands) - 1], 'TextCmd')) {
+            error_log("Unknown character sequence: " . $this->get_rawData() . "",0);
             $top = new TextCmd($this -> context, array());
             if ($top -> addChar($char)) {
                 // Character was accepted to start a string.
@@ -187,5 +190,9 @@ class Printout extends Command
             }
         }
         fwrite(STDERR, "WARNING: Unknown command " . implode(' ', $cmdStack) . "\n");
+    }
+
+    public function get_rawData(){
+        return $this->rawData;
     }
 }

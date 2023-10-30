@@ -7,6 +7,7 @@ use ReceiptPrintHq\EscposTools\Parser\Command\TextContainer;
 class TextCmd extends Command implements TextContainer
 {
     private $str = "";
+    private $rawData = "";
 
     public function addChar($char)
     {
@@ -14,6 +15,7 @@ class TextCmd extends Command implements TextContainer
             // Reject ESC/POS control chars.
             return false;
         }
+        $this->rawData .= $char;
         $this -> str .= iconv('CP437', 'UTF-8', $char);
         return true;
     }
@@ -21,5 +23,9 @@ class TextCmd extends Command implements TextContainer
     public function getText()
     {
         return $this -> str;
+    }
+
+    public function get_data(){
+        return $this -> rawData;
     }
 }

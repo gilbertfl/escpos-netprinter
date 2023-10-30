@@ -17,7 +17,8 @@ RUN apt-get install -y python3-flask
 RUN apt-get install -y python3-lxml
 
 #Installation de php-qrcode :requiert seulement imagick
-RUN composer require chillerlan/php-qrcode:"^4.3.4" --prefer-stable
+#RUN composer require chillerlan/php-qrcode:"^4.3.4" --prefer-stable
+#RUN composer require chillerlan/php-qrcode:"5.0-beta"  
 RUN composer install
 RUN rm composer.json && rm composer.lock
 

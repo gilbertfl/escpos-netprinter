@@ -2,16 +2,20 @@
 namespace ReceiptPrintHq\EscposTools\Parser\Command;
 
 use ReceiptPrintHq\EscposTools\Parser\Command\DataSubCmd;
+use ReceiptPrintHq\EscposTools\Parser\Command\Command;
 
 
 class QRcodeSubCommand extends DataSubCmd
 {
 
     private $fn = null;
+    private $data = "";
+    private int $dataSize;
 
-    public function __construct($dataSize)
+
+    public function __construct($newdataSize)
     {
-        $this->dataSize = $dataSize - 1;  //$dataSize is the size of [parameters], so we exclude the fn byte
+        $this->dataSize = $newdataSize;  //$dataSize is the size of [parameters], so we exclude the fn byte
     }
 
     public function addChar($char)
@@ -21,10 +25,15 @@ class QRcodeSubCommand extends DataSubCmd
             $this -> fn = ord($char);
             return true;
         }
-        else{ 
-            //then send [parameters] into $data
-            return parent::addChar($char);
-        }
+        elseif(strlen($this -> data) < $this -> dataSize) {  
+                //then send [parameters] into $data
+                //Copied from DataSubCmd.
+                $this -> data .= $char;
+                return true;
+            }
+        else{
+                return false;
+            }
     }
 
     public function get_fn(){
@@ -35,4 +44,10 @@ class QRcodeSubCommand extends DataSubCmd
         return $this->data;
     }
 
+	/**
+	 * @return int
+	 */
+	public function getDataSize(): int {
+		return $this->dataSize;
+	}
 }

@@ -8,14 +8,37 @@ use ReceiptPrintHq\EscposTools\Parser\Context\Code2DStateStorage;
 use ReceiptPrintHq\EscposTools\Parser\Parser;
 use ReceiptPrintHq\EscposTools\Parser\Context\InlineFormatting;
 
+$debugMode = false;
+$targetFilename = "";
+
+error_log("esc2html starting", 0);
 // Usage
-if (!isset($argv[1])) {
-    print("Usage: " . $argv[0] . " filename\n");
+if ($argc < 2) {
+    print("Usage: " . $argv[0] . " [--debug] filename \n"."zéro args");
     die();
 }
+else {
+    if ($argv[1]=='--debug'){ 
+        $debugMode = true;
+        if (!isset($argv[2])) {
+            print("Usage: " . $argv[0] . " [--debug] filename ". $argc-1 . " arguments received\n");
+            die();
+        }
+        else $targetFilename = $argv[2];
+        error_log("Debug mode enabled", 0);
+    }
+    else {  //First argument is not '--debug'
+        if(isset($argv[2])) { // But there is at least 2 args
+            print("Usage: " . $argv[0] . " [--debug] filename \n". $argc-1 . " arguments received\n");
+            die();
+        }
+        else $targetFilename = $argv[1]; //The only argument is the filename.
+    }
+}
+if ($debugMode)  error_log("Target filename: " . $targetFilename . "", 0);
 
 // Load in a file
-$fp = fopen($argv[1], 'rb');
+$fp = fopen($targetFilename, 'rb');
 
 $parser = new Parser();
 $parser -> addFile($fp);
@@ -31,6 +54,8 @@ $skipLineBreak = false;
 $code2dStorage = new Code2DStateStorage();
 
 foreach ($commands as $cmd) {
+    if ($debugMode) error_log("". get_class($cmd) ."", 0); //Output the command class in the debug console
+    
     if ($cmd -> isAvailableAs('InitializeCmd')) {
         $formatting = InlineFormatting::getDefault();
     }
@@ -40,6 +65,7 @@ foreach ($commands as $cmd) {
     if ($cmd -> isAvailableAs('TextContainer')) {
         // Add text to line
         // TODO could decode text properly from legacy code page to UTF-8 here.
+        if ($debugMode) error_log("Text or unidentified command: '". $cmd->get_data() ."' ", 0);
         $spanContentText = $cmd -> getText();
         $lineHtml .= span($formatting, $spanContentText);
     }
@@ -78,31 +104,44 @@ foreach ($commands as $cmd) {
     }
     if ($cmd -> isAvailableAs('Code2DDataCmd')){
         $sub = $cmd -> subCommand();
-        if($sub->isAvaliableAs('QRcodeSubCommand')){
-            switch ($sub->get_fn()) {
-                case 65:  //set model
-                    $code2dStorage->setQRModel($sub->get_data());
-                    break;
-                case 67: //set module size
-                    $code2dStorage->setModuleSize($sub->get_data());
-                    break;
-                case 69: //select error correction level
-                    $code2dStorage->setErrorCorrectLevel($sub->get_data());
-                    break;
-                case 80:  //Store QR data
-                    $code2dStorage->fillSymbolStorage($sub->get_data());
-                    break;
-                case 81:  //Print the QR code
-                    // TODO: what to do if the QR code data has not yet been sent?
-                    $qrcodeURI = $code2dStorage->getQRCodeURI();
-                    $qrcodeData = $code2dStorage->getQRCodeData();
-                    
-                    $outp[] = qrCodeAsDataUrl($qrcodeURI, $qrcodeData);
-                    break;
-                case 82:  //Transmit size information of symbol storage data.
-                    # TODO: maybe implement by printing the info?
-                    break;
-            }
+
+        if ($debugMode)  {
+            error_log("Subcommand ". get_class($sub) ."", 0); //Output the subcommand class in the debug console
+            error_log("Function " . $sub->get_fn() ."",0);
+            error_log("Data size:". $sub->getDataSize() ."",0);
+            error_log("Data: '" . $sub->get_data() ."",0);
+        }
+
+        switch ($sub->get_fn()) {
+            case 65:  //set model
+                if ($debugMode) error_log("Set model to ". $sub->get_data() . "", 0);
+                $code2dStorage->setQRModel($sub->get_data());
+                break;
+            case 67: //set module size
+                if ($debugMode) error_log("Set module size to ". $sub->get_data() . "", 0);
+                $code2dStorage->setModuleSize($sub->get_data());
+                break;
+            case 69: //select error correction level
+                if ($debugMode) error_log("Set ECC to ". $sub->get_data() . "", 0);
+                $code2dStorage->setErrorCorrectLevel($sub->get_data());
+                break;
+            case 80:  //Store QR data
+                if ($debugMode) error_log("Store '". $sub->get_data() . "' in symbol storage", 0);
+                $code2dStorage->fillSymbolStorage($sub->get_data());
+                break;
+            case 81:  //Print the QR code
+                
+                if ($debugMode) error_log("Print the QR code.", 0);
+                // TODO: what to do if the QR code data has not yet been sent?
+                $qrcodeURI = '';   //$qrcodeURI = $code2dStorage->getQRCodeURI();
+                $qrcodeData = $code2dStorage->getQRCodeData();
+                if($debugMode) error_log("QR data: '". $qrcodeData . "'", 0);
+                
+                $outp[] = qrCodeAsDataUrl($qrcodeURI, "yo some QR data");
+                break;
+            case 82:  //Transmit size information of symbol storage data.
+                # TODO: maybe implement by printing the info?
+                break;
         }
     }
 }
@@ -143,7 +182,7 @@ function imgAsDataUrl($bufferedImg)
 function qrCodeAsDataUrl($bufferedQRImg, $qrcodeData)
 {
     $imgSrc = "data:image/png;base64," . $bufferedQRImg;
-    return "<img class=\"esc-bitimage\" src=\"$imgSrc\" alt=\"$qrcodeData\" />";
+    return "<img class=\"esc-bitimage\"  alt=\"$qrcodeData\" />"; // TODO: remettre src=\"$imgSrc\"
 }
 
 function wrapInline($tag, $closeTag, $content)
