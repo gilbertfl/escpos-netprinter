@@ -16,13 +16,6 @@ vendor/
 
 # other build files
 build/*
-/__pycache__/**
 *.phar
 composer.lock
-cups/*.tar.gz
 
-# Test and runtime-generated files
-web/receipts/*.html
-web/tmp/reception.bin
-web/receipt_list.csv
-web/tmp/*_log
