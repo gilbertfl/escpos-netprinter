@@ -5,6 +5,7 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 use ReceiptPrintHq\EscposTools\Parser\Parser;
+use ReceiptPrintHq\EscposTools\Parser\Context\InlineFormatting;
 
 // Usage
 if (!isset($argv[1])) {
@@ -20,6 +21,7 @@ $parser = new Parser();
 $parser -> addFile($fp);
 
 // Extract text
+$formatting = InlineFormatting::getDefault();
 $commands = $parser -> getCommands();
 foreach ($commands as $cmd) {
     if ($debug) {
@@ -33,10 +35,15 @@ foreach ($commands as $cmd) {
         fwrite(STDERR, "[DEBUG] $className {$implStr}\n");
     }
     if ($cmd -> isAvailableAs('TextContainer')) {
-        echo $cmd -> getText();
+        //Output the text, transcoded to UTF-8 from the current code table
+        echo $cmd -> getText($formatting);
     }
     if ($cmd -> isAvailableAs('LineBreak')) {
         echo "\n";
+    }
+    if($cmd -> isAvailableAs('SelectCharCodeCmd')){
+        //Let's set the character code table
+        $formatting -> setCharCodeTable($cmd->getCodePage());
     }
 }
 

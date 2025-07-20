@@ -3,7 +3,8 @@
 		"php": "^8.4",
 		"squizlabs/php_codesniffer" : "^2.8",
 		"mike42/escpos-php": "^1.5",
-		"chillerlan/php-qrcode": "^5.0.3"  
+		"chillerlan/php-qrcode": "^5.0.3", 
+		"zbateson/mb-wrapper": "2.0.1" 
 	},
 	"autoload" : {
 		"psr-4" : {

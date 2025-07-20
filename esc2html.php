@@ -70,11 +70,14 @@ foreach ($commands as $cmd) {
     if ($cmd -> isAvailableAs('InlineFormattingCmd')) {
         $cmd -> applyToInlineFormatting($formatting);
     }
+    if($cmd -> isAvailableAs('SelectCharCodeCmd')){
+        //Let's set the character code table
+        $formatting -> setCharCodeTable($cmd->getCodePage());
+    }
     if ($cmd -> isAvailableAs('TextContainer')) {
         // Add text to line
-        // TODO could decode text properly from legacy code page to UTF-8 here.
         if ($debugMode) error_log("Text or unidentified command: '". $cmd->getText() ."' ", 0);
-        $spanContentText = $cmd -> getText();
+        $spanContentText = $cmd -> getText($formatting);
         $lineHtml .= span($formatting, $spanContentText);
     }
     if ($cmd -> isAvailableAs('LineBreak') && $skipLineBreak) {
