@@ -80,6 +80,10 @@ foreach ($commands as $cmd) {
         $spanContentText = $cmd -> getText($formatting);
         $lineHtml .= span($formatting, $spanContentText);
     }
+    if ($cmd -> isAvailableAs('HorizontalTabCmd')) {
+        $lineHtml .= str_repeat('&nbsp;', 8);
+        continue;
+    }
     if ($cmd -> isAvailableAs('LineBreak') && $skipLineBreak) {
         $skipLineBreak = false;
     } else if ($cmd -> isAvailableAs('LineBreak')) {
