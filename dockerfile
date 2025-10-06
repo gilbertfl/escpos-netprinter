@@ -37,7 +37,7 @@ RUN rm /etc/cups/snmp.conf
 RUN rm /home/escpos-emu/cups/cups-files.conf
 
 #Installation HTML converter
-RUN composer install
+RUN composer install --no-dev
 RUN rm composer.json && rm composer.lock
 
 #Configurer l'environnement d'exécution 
