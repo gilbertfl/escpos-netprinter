@@ -71,6 +71,7 @@ class SelectBitImageModeCmd extends EscposCommand implements ImageContainer
         $im -> readImageBlob($pbmBlob, 'pbm');
         $im -> rotateImage('#fff', 90.0);
         $im -> flopImage();
+        $im -> negateImage(true);
         return $im -> getImageBlob();
     }
     
