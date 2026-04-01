@@ -6,6 +6,9 @@
 .project
 .buildpath
 
+# Intellj files
+.idea/*
+
 # doxygen files
 doc/html
 doc/latex

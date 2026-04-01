@@ -13,6 +13,7 @@
         <li>{{ _("En ligne")}}</li>
         <li>{{ _("Adresse de cette imprimante:")}} {{host}}</li>
         <li>{{ _("Ports d'impression:")}} {{jetDirectPort}} (Jetdirect), 515 (lpd)</li>
+        <li>ESCPOS-netprinter v{{APP_VERSION}} — Python {{PYTHON_VERSION}}, PHP {{PHP_VERSION}}</li>
         {%if debug == 'True'%}
             <li><b style="color:#8B0000">{{ _("Mode débogage activé")}}</b></li>
         {%endif%}

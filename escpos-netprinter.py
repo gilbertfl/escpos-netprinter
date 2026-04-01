@@ -1,4 +1,5 @@
 import os
+import sys
 from flask import Flask, redirect, render_template, request, session, url_for
 from os import getenv
 from io import BufferedWriter
@@ -12,7 +13,9 @@ from zoneinfo import ZoneInfo
 from flask_babel import Babel
 import babel_config
 
-import threading 
+import threading
+
+APP_VERSION = "3.2" 
 import socketserver
 
 #Network ESC/pos printer server
@@ -388,7 +391,7 @@ class ESCPOSHandler(socketserver.StreamRequestHandler):
                     #Append the processed byte(s) to the receive buffer
                     receive_buffer = receive_buffer + indata_statuscheck
 
-        
+
             except TimeoutError:
                 print("Timeout while reading")
                 self.connection.close()
@@ -1503,7 +1506,10 @@ babel = Babel(app, locale_selector=get_locale)
 @app.context_processor
 def inject_conf_var():
     return dict(AVAILABLE_LANGUAGES=babel_config.Config.LANGUAGES,
-                CURRENT_LANGUAGE=get_locale())
+                CURRENT_LANGUAGE=get_locale(),
+                APP_VERSION=APP_VERSION,
+                PYTHON_VERSION=sys.version.split()[0],
+                PHP_VERSION=subprocess.run(["php", "-r", "echo PHP_VERSION;"], capture_output=True, text=True).stdout)
 
 @app.route('/language=<language>')
 def set_language(language=None):
