@@ -1401,9 +1401,9 @@ class ESCPOSHandler(socketserver.StreamRequestHandler):
         print("Printing ", binfile.name)
         try:
             if self.netprinter_debugmode == 'True':
-                recu:CompletedProcess = subprocess.run(["php", "esc2html.php", "--debug", bin_filename.as_posix()], capture_output=True, text=True, check=True)
+                recu:CompletedProcess = subprocess.run(["php", "esc2html.php", "--debug", bin_filename.as_posix()], capture_output=True, text=True, encoding='utf-8', errors='replace', check=True)
             else:
-                recu:CompletedProcess = subprocess.run(["php", "esc2html.php", bin_filename.as_posix()], capture_output=True, text=True, check=True)
+                recu:CompletedProcess = subprocess.run(["php", "esc2html.php", bin_filename.as_posix()], capture_output=True, text=True, encoding='utf-8', errors='replace', check=True)
 
         except subprocess.CalledProcessError as err:
             print(f"Error while converting receipt: {err.returncode}")
