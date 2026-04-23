@@ -14,18 +14,9 @@ from flask_babel import Babel
 import babel_config
 
 import threading
+import socketserver
 
 APP_VERSION = "3.2"
-
-try:
-    PHP_VERSION = subprocess.run(
-        ["php", "-r", "echo phpversion();"],
-        capture_output=True, text=True, check=True
-    ).stdout.strip()
-except (FileNotFoundError, subprocess.CalledProcessError):
-    PHP_VERSION = "N/A"
-
-import socketserver
 
 #Network ESC/pos printer server
 class ESCPOSServer(socketserver.TCPServer):
@@ -1648,6 +1639,12 @@ if __name__ == "__main__":
     port = getenv('FLASK_RUN_PORT', '5000')
     flask_debugmode = getenv('FLASK_RUN_DEBUG', "false")
     printPort = getenv('PRINTER_PORT', '9100')
+
+    try:
+        PHP_VERSION = subprocess.run(["php", "-r", "echo phpversion();"],
+                                    capture_output=True, text=True, check=True).stdout.strip()
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        PHP_VERSION = "N/A"
 
     print("Starting ESCPOS-netprinter", flush=True)
 
