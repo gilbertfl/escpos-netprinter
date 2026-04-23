@@ -15,7 +15,16 @@ import babel_config
 
 import threading
 
-APP_VERSION = "3.2" 
+APP_VERSION = "3.2"
+
+try:
+    PHP_VERSION = subprocess.run(
+        ["php", "-r", "echo phpversion();"],
+        capture_output=True, text=True, check=True
+    ).stdout.strip()
+except (FileNotFoundError, subprocess.CalledProcessError):
+    PHP_VERSION = "N/A"
+
 import socketserver
 
 #Network ESC/pos printer server
@@ -1509,7 +1518,7 @@ def inject_conf_var():
                 CURRENT_LANGUAGE=get_locale(),
                 APP_VERSION=APP_VERSION,
                 PYTHON_VERSION=sys.version.split()[0],
-                PHP_VERSION=subprocess.run(["php", "-r", "echo PHP_VERSION;"], capture_output=True, text=True).stdout)
+                PHP_VERSION=PHP_VERSION)
 
 @app.route('/language=<language>')
 def set_language(language=None):
