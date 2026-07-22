@@ -9,8 +9,8 @@ body {
   padding: 1em;
   /*min-width: 28em;*/
   width: 80mm; /* 80mm is the width of a paper receipt.  Other sizes include 52mm */
-  transform: scale(1.25);
-  transform-origin: top left;
+  /*transform: scale(1.25);
+  transform-origin: top left;*/
   display: inline-block;
 }
 

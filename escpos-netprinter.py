@@ -1,6 +1,6 @@
 import os
 import sys
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for, jsonify
 from os import getenv
 from io import BufferedWriter
 import csv
@@ -1574,7 +1574,45 @@ def show_receipt(fileID:int):
             receipt_html = receipt_html.replace('<body>', '<body style="display: flex;flex-direction: column;min-height: 100vh;"><div id="page" style="flex-grow: 1;">')
             receipt_html = receipt_html.replace('</body>', '</div>' + render_template('footer.html.j2') + '</body>')  # Append the footer
             return receipt_html
-    
+
+@app.route('/api/preview', methods=['POST'])
+def api_preview():
+    order_id = request.form.get('order_id')
+    raw = request.data or request.files.get('file').read() if request.files.get('file') else None
+
+    if not order_id or not raw:
+        return jsonify({'success': False, 'error': 'Missing order_id or file'}), 400
+
+    base = '/home/escpos-emu'
+    tmp = os.path.join(base, 'tmp', f"receipt-{order_id}.escpos")
+    html = os.path.join(base, 'web', 'receipts', f"order-{order_id}.html")
+    csv = os.path.join(base, 'web', 'receipt_list.csv')
+
+    os.makedirs(os.path.dirname(tmp), exist_ok=True)
+    os.makedirs(os.path.dirname(html), exist_ok=True)
+    open(csv, 'a').close()
+
+    with open(tmp, 'wb') as f:
+        f.write(raw)
+
+    # Remove old preview
+    try: os.remove(html)
+    except OSError: pass
+
+    # Update CSV (remove old line + append new)
+    lines = []
+    if os.path.exists(csv):
+        with open(csv, 'r') as f: lines = [l for l in f if not l.startswith(f"{order_id},")]
+    with open(csv, 'w') as f:
+        f.writelines(lines)
+        f.write(f"{order_id},order-{order_id}.html\n")
+
+    # Convert to HTML using esc2html.php
+    subprocess.run(['php', os.path.join(base, 'esc2html.php'), tmp],
+                   stdout=open(html, 'w'), check=True)
+
+    return jsonify({'success': True, 'preview_url': f"http://escpos-preview:8087/recus/{order_id}"})
+
 
 @app.route("/newReceipt")
 def publish_receipt_from_CUPS():
