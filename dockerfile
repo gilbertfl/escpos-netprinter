@@ -1,6 +1,5 @@
-#On part de l'image php-cli "latest" sur Debian
-#FROM php:cli
-FROM php:8.4-cli
+# We start from the 8.4.27 image specifically to make sure the PHPshell vulnerability is patched.  We will have to change this back to 8.4 or more recent later.
+FROM php:8.4.27-cli
 
 #On va utiliser l'utilitaire "install-php-extensions" au lieu de PECL car il marche mieux.
 #Voir:  https://github.com/mlocati/docker-php-extension-installer
@@ -37,11 +36,12 @@ ADD cups/cups-files.conf /etc/cups/cups-files.conf
 RUN rm /etc/cups/snmp.conf
 RUN rm /home/escpos-emu/cups/cups-files.conf
 
-#Installation HTML converter
+#Install HTML converter
 RUN composer install
 RUN rm composer.json && rm composer.lock
 
-#Configurer l'environnement d'exécution 
+#Configure execution environment
+#Startup app in Flask.  DO NOT CHANGE.
 ENV FLASK_APP=escpos-netprinter.py
 #Accepted source IP addresses
 ENV FLASK_RUN_HOST=0.0.0.0
