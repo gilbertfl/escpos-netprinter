@@ -28,26 +28,26 @@ docker run -d  \
     -p 80:80/tcp   \
     -p 9100:9100/tcp \
     --mount source=receiptVolume,target=/home/escpos-emu/web \
-    gilbertfl/escpos-netprinter:3.2
+    gilbertfl/escpos-netprinter:3.3
 ```
 ### Once started
 Once started, the container will accept prints by JetDirect on the default port(9100) and by lpd on the default port(515).   You can access all received receipts with the web application at port 80.  
 
 The receipts are kept on a docker volume, so they will be kept if the container is restarted.   To make the prints temporary, simply remove the `--mount` line from the run command.
 
-Version 3.2 is capable of dealing with all status requests from POS systems as described in the Epson APG.
+Like version 3.2, version 3.3 is capable of dealing with all status requests from POS systems as described in the Epson APG. The difference is that 3.3 is based on the brand-new PHP version that patches the PHPShell vulnerability.  
 
 ## Working on the code
 
 ### Building from source
 
-To install v3.2 from source:
+To install v3.3 from source:
 
 ```bash
-wget --show-progress https://github.com/gilbertfl/escpos-netprinter/archive/refs/tags/3.2.zip
-unzip 3.2.zip 
-cd escpos-netprinter-3.2
-docker build -t escpos-netprinter:3.2 .
+wget --show-progress https://github.com/gilbertfl/escpos-netprinter/archive/refs/tags/3.3.zip
+unzip 3.3.zip 
+cd escpos-netprinter-3.3
+docker build -t escpos-netprinter:3.3 .
 ```
 
 To run the resulting container:
@@ -57,7 +57,7 @@ docker run -d  \
     -p 80:80/tcp   \
     -p 9100:9100/tcp \
     --mount source=receiptVolume,target=/home/escpos-emu/web \
-    escpos-netprinter:3.2
+    escpos-netprinter:3.3
 ```
 
 ### Debugging 
@@ -71,7 +71,7 @@ docker run -d  \
     -p 9100:9100/tcp \
     --mount source=receiptVolume,target=/home/escpos-emu/web \
     --env ESCPOS_DEBUG=True  \
-    escpos-netprinter:3.2
+    escpos-netprinter:3.3
 ```
 Setting this variable will generate logs from 3 different sources:
 - The CUPS printer driver
@@ -87,7 +87,7 @@ docker run -d  \
     -p 9100:9100/tcp \
     -p 631:631/tcp
     --mount source=receiptVolume,target=/home/escpos-emu/web \
-    escpos-netprinter:3.2
+    escpos-netprinter:3.3
 ```
 
 ### Runtime Directory Structure

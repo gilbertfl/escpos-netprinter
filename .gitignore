@@ -29,3 +29,4 @@ web/receipts/*.html
 web/tmp/reception.bin
 web/receipt_list.csv
 web/tmp/*_log
+index.html
